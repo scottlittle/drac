@@ -9,7 +9,7 @@ setup(
     version=version,
     maintainer='Vasily Evseenko',
     maintainer_email='svpcom@gmail.com',
-    packages=['hyperloglog'],
+    packages=['hyperloglog', 'hyperloglog.test'],
     license='LGPL',
     long_description=open('README.rst').read(),
 )
