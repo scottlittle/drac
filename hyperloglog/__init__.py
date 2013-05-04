@@ -1,1 +1,2 @@
-from hll import HyperLogLog 
+from hll import HyperLogLog
+from shll import SlidingHyperLogLog

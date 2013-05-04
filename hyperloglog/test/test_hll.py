@@ -8,7 +8,7 @@ class HyperLogLogTestCase(TestCase):
     def test_alpha(self):
         alpha = [HyperLogLog._get_alpha(b) for b in range(4, 10)]
         self.assertEqual(alpha, [0.673, 0.697, 0.709, 0.7152704932638152, 0.7182725932495458, 0.7197831133217303])
-    
+
     def test_alpha_bad(self):
         self.assertRaises(ValueError, HyperLogLog._get_alpha, 1)
         self.assertRaises(ValueError,HyperLogLog. _get_alpha, 17)
@@ -71,7 +71,7 @@ class HyperLogLogTestCase(TestCase):
             c.add(str(i))
 
         a.update(b)
-        
+
         self.assertNotEqual(a, b)
         self.assertNotEqual(b, c)
         self.assertEqual(a, c)
