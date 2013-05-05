@@ -44,6 +44,16 @@ class SlidingHyperLogLogTestCase(TestCase):
         M = [(i, max(R for ts, R in lpfm)) for i, lpfm in enumerate(s.LPFM) if lpfm]
         self.assertEqual(M, [(31, 1), (120, 1), (122, 4), (151, 5), (171, 3), (176, 1), (196, 1), (268, 1), (443, 2), (474, 1)])
 
+    def test_from_list(self):
+        s1 = SlidingHyperLogLog(0.05, 100)
+
+        for i in range(10):
+            s1.add(i, str(i))
+
+        s2 = SlidingHyperLogLog.from_list(s1.LPFM, 100)
+        self.assertEqual(s1, s2)
+        self.assertEqual(s1.card(9), s2.card(9))
+
     def test_calc_cardinality(self):
         for cardinality in (1, 2, 3, 5, 10, 1500, 100000):
             a = SlidingHyperLogLog(0.05, 100)

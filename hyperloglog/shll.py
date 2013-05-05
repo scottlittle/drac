@@ -15,7 +15,7 @@ class SlidingHyperLogLog(object):
 
     __slots__ = ('window', 'alpha', 'b', 'm', 'LPFM', 'bitcount_arr')
 
-    def __init__(self, error_rate, window):
+    def __init__(self, error_rate, window, lpfm=None):
         """
         Implementes a HyperLogLog
 
@@ -23,19 +23,34 @@ class SlidingHyperLogLog(object):
         """
 
         self.window = window
-        if not (0 < error_rate < 1):
-            raise ValueError("Error_Rate must be between 0 and 1.")
 
-        # error_rate = 1.04 / sqrt(m)
-        # m = 2 ** b
+        if lpfm is not None:
+             m = len(lpfm)
+             b = int(math.log(m, 2))
 
-        b = int(math.ceil(math.log((1.04 / error_rate) ** 2, 2)))
+             if (1 << b) != m:
+                 raise ValueError('List length is not power of 2')
+             self.LPFM = lpfm
+
+        else:
+            if not (0 < error_rate < 1):
+                raise ValueError("Error_Rate must be between 0 and 1.")
+
+            # error_rate = 1.04 / sqrt(m)
+            # m = 2 ** b
+
+            b = int(math.ceil(math.log((1.04 / error_rate) ** 2, 2)))
+            m = 1 << b
+            self.LPFM = [[] for i in range(m)]
 
         self.alpha = self._get_alpha(b)
         self.b = b
-        self.m = 1 << b
-        self.LPFM = [ [] for i in range(self.m) ]
-        self.bitcount_arr = [ 1L << i for i in range(160 - b + 1) ]
+        self.m = m
+        self.bitcount_arr = [1L << i for i in range(160 - b + 1)]
+
+    @classmethod
+    def from_list(cls, lpfm, window):
+        return cls(None, window, lpfm)
 
     @staticmethod
     def _get_alpha(b):
