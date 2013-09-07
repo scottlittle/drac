@@ -5,7 +5,6 @@ Sliding HyperLogLog
 import math
 import heapq
 from hashlib import sha1
-from itertools import chain
 from hll import get_treshold, estimate_bias, get_alpha, get_rho
 
 class SlidingHyperLogLog(object):
@@ -41,7 +40,7 @@ class SlidingHyperLogLog(object):
 
             p = int(math.ceil(math.log((1.04 / error_rate) ** 2, 2)))
             m = 1 << p
-            self.LPFM = [[] for i in range(m)]
+            self.LPFM = [None for i in range(m)]
 
         self.alpha = get_alpha(p)
         self.p = p
@@ -69,7 +68,7 @@ class SlidingHyperLogLog(object):
         Rmax = None
         tmp = []
         tmax = None
-        tmp2 = list(heapq.merge(self.LPFM[j], [(timestamp, R)]))
+        tmp2 = list(heapq.merge(self.LPFM[j] if self.LPFM[j] is not None else [], [(timestamp, R)]))
 
         for t, R in reversed(tmp2):
                 if tmax is None:
@@ -83,7 +82,7 @@ class SlidingHyperLogLog(object):
                     Rmax = R
 
         tmp.reverse()
-        self.LPFM[j] = tmp
+        self.LPFM[j] = tuple(tmp) if tmp else None
 
     def update(self, *others):
         """
@@ -98,7 +97,7 @@ class SlidingHyperLogLog(object):
             Rmax = None
             tmp = []
             tmax = None
-            tmp2 = list(heapq.merge(*([item.LPFM[j] for item in others] + [self.LPFM[j]])))
+            tmp2 = list(heapq.merge(*([item.LPFM[j] if item.LPFM[j] is not None else [] for item in others] + [self.LPFM[j] if self.LPFM[j] is not None else []])))
 
             for t, R in reversed(tmp2):
                 if tmax is None:
@@ -112,7 +111,7 @@ class SlidingHyperLogLog(object):
                     Rmax = R
 
             tmp.reverse()
-            self.LPFM[j] = tmp
+            self.LPFM[j] = tuple(tmp) if tmp else None
 
     def __eq__(self, other):
         if self.m != other.m:
@@ -136,7 +135,10 @@ class SlidingHyperLogLog(object):
         if not 0 < window <= self.window:
             raise ValueError('0 < window <= W')
 
-        M = [max(chain((R for ts, R in lpfm if ts >= (timestamp - window)), iter([0]))) for lpfm in self.LPFM]
+        def max_r(l):
+            return max(l) if l else 0
+
+        M = tuple(max_r([R for ts, R in lpfm if ts >= (timestamp - window)]) if lpfm else 0 for lpfm in self.LPFM)
 
         E = self.alpha * float(self.m ** 2) / sum(math.pow(2.0, -x) for x in M)
         Ep = (E - estimate_bias(E, self.p)) if E <= 5 * self.m else E
