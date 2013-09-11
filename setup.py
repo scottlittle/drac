@@ -2,7 +2,7 @@
 
 from distutils.core import setup
 
-version = '0.0.6'
+version = '0.0.7'
 
 setup(
     name='hyperloglog',
@@ -13,7 +13,7 @@ setup(
     license='LGPL 2.1 or later',
     long_description=\
 """
-Python implementation of the Hyper LogLog and Sliding Hyper LogLog cardinality counter 
+Python implementation of the Hyper LogLog and Sliding Hyper LogLog cardinality counter
 algorithms. Added bias correction from HLL++.
 
 http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf

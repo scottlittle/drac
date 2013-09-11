@@ -148,4 +148,45 @@ class SlidingHyperLogLog(object):
         H = self.m * math.log(self.m / float(V)) if V > 0 else Ep
         return H if H <= get_treshold(self.p) else Ep
 
+    def card_wlist(self, timestamp, window_list):
+        """
+        Returns the estimate of the cardinality at 'timestamp' using list of windows
+        """
+        for window in window_list:
+            if not 0 < window <= self.window:
+                raise ValueError('0 < window <= W')
+
+        tsl = sorted((timestamp - window, idx) for idx, window in enumerate(window_list))
+        M_list = list([] for _ in window_list)
+
+        # Highly optimized code
+        for lpfm in self.LPFM:
+            R_max = 0
+            _p = len(tsl) - 1
+            if lpfm:
+                i = len(lpfm) - 1
+                while i >= 0:
+                    ts, R = lpfm[i]
+                    while _p >= 0:
+                        _ts, _idx = tsl[_p]
+                        if ts >= _ts: break
+                        M_list[_idx].append(R_max)
+                        _p -= 1
+                    if _p < 0: break
+                    R_max = R
+                    i -= 1
+
+            for i in xrange(0, _p + 1):
+                M_list[tsl[i][1]].append(R_max)
+
+        res = []
+        for M in M_list:
+            E = self.alpha * float(self.m ** 2) / sum(math.pow(2.0, -x) for x in M)
+            Ep = (E - estimate_bias(E, self.p)) if E <= 5 * self.m else E
+
+            #count number or registers equal to 0
+            V = M.count(0)
+            H = self.m * math.log(self.m / float(V)) if V > 0 else Ep
+            res.append(H if H <= get_treshold(self.p) else Ep)
+        return res
 

@@ -33,6 +33,7 @@ class SlidingHyperLogLogTestCase(TestCase):
         s2 = SlidingHyperLogLog.from_list(s1.LPFM, 100)
         self.assertEqual(s1, s2)
         self.assertEqual(s1.card(9), s2.card(9))
+        self.assertEqual(s1.card_wlist(9, [100, 3, 5]), [s2.card(9, 100), s2.card(9, 3), s2.card(9, 5)])
 
     def test_calc_cardinality(self):
         clist = [1, 5, 10, 30, 60, 200, 1000, 10000, 60000]
@@ -86,6 +87,26 @@ class SlidingHyperLogLogTestCase(TestCase):
             z = (float(s) / n - card_stored) / (rel_err * card_stored / math.sqrt(n))
             self.assertLess(-1.96, z)
             self.assertGreater(1.96, z)
+
+    def test_calc_cardinality_sliding3(self):
+        clist = [30, 60, 200, 1000, 10000, 60000]
+        rel_err = 0.05
+        t1 = 0
+        t2 = 0
+        for card in clist:
+            a = SlidingHyperLogLog(rel_err, card)
+
+            for i in xrange(card):
+                a.add(i, os.urandom(20))
+
+            ts = time.time()
+            l1 = [a.card(1.5 * card, w / 10.0) for w in range(1, card + 1, card / 10)]
+            t1 = (time.time() - ts)
+            ts = time.time()
+            l2 = a.card_wlist(1.5 * card, [ w / 10.0 for w in range(1, card + 1, card / 10)])
+            t2 = (time.time() - ts)
+            #print card, t1, t2
+            self.assertEqual(l1, l2)
 
     def test_update(self):
         a = SlidingHyperLogLog(0.05, 100)

@@ -4,7 +4,7 @@ This module implements probabilistic data structure which is able to calculate t
 
 import math
 from hashlib import sha1
-
+from functools32 import lru_cache
 from const import rawEstimateData, biasData, tresholdData
 
 
@@ -12,6 +12,7 @@ def get_treshold(p):
     return tresholdData[p - 4]
 
 
+@lru_cache(1000)
 def estimate_bias(E, p):
     bias_vector = biasData[p - 4]
     nearest_neighbors = get_nearest_neighbors(E, rawEstimateData[p - 4])
