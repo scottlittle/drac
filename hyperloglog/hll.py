@@ -4,7 +4,6 @@ This module implements probabilistic data structure which is able to calculate t
 
 import math
 from hashlib import sha1
-from functools32 import lru_cache
 from const import rawEstimateData, biasData, tresholdData
 
 
@@ -12,16 +11,16 @@ def get_treshold(p):
     return tresholdData[p - 4]
 
 
-@lru_cache(1000)
 def estimate_bias(E, p):
     bias_vector = biasData[p - 4]
     nearest_neighbors = get_nearest_neighbors(E, rawEstimateData[p - 4])
-    return sum(float(bias_vector[i]) for i in nearest_neighbors) / len(nearest_neighbors)
+    return sum([float(bias_vector[i]) for i in nearest_neighbors]) / len(nearest_neighbors)
 
 
 def get_nearest_neighbors(E, estimate_vector):
-    distance_map = sorted(((E - float(val)) ** 2, idx) for idx, val in enumerate(estimate_vector))
-    return list(idx for dist, idx in distance_map)[:6]
+    distance_map = [((E - float(val)) ** 2, idx) for idx, val in enumerate(estimate_vector)]
+    distance_map.sort()
+    return [idx for dist, idx in distance_map[:6]]
 
 
 def get_alpha(p):
@@ -102,7 +101,7 @@ class HyperLogLog(object):
             if self.m != item.m:
                 raise ValueError('Counters precisions should be equal')
 
-        self.M = list(max(*items) for items in zip(*([ item.M for item in others ] + [ self.M ])))
+        self.M = [max(*items) for items in zip(*([ item.M for item in others ] + [ self.M ]))]
 
     def __eq__(self, other):
         if self.m != other.m:
@@ -116,16 +115,21 @@ class HyperLogLog(object):
     def __len__(self):
         return round(self.card())
 
+    def _Ep(self):
+        E = self.alpha * float(self.m ** 2) / sum(math.pow(2.0, -x) for x in self.M)
+        return (E - estimate_bias(E, self.p)) if E <= 5 * self.m else E
+
     def card(self):
         """
         Returns the estimate of the cardinality
         """
 
-        E = self.alpha * float(self.m ** 2) / sum(math.pow(2.0, -x) for x in self.M)
-        Ep = (E - estimate_bias(E, self.p)) if E <= 5 * self.m else E
-
         #count number or registers equal to 0
         V = self.M.count(0)
-        H = self.m * math.log(self.m / float(V)) if V > 0 else Ep
-        return H if H <= get_treshold(self.p) else Ep
+
+        if V > 0:
+            H = self.m * math.log(self.m / float(V))
+            return H if H <= get_treshold(self.p) else self._Ep()
+        else:
+            return self._Ep()
 

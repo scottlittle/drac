@@ -7,6 +7,7 @@ import heapq
 from hashlib import sha1
 from hll import get_treshold, estimate_bias, get_alpha, get_rho
 
+
 class SlidingHyperLogLog(object):
     """
     Sliding HyperLogLog: Estimating cardinality in a data stream (Telecom ParisTech)
@@ -125,6 +126,10 @@ class SlidingHyperLogLog(object):
     def __len__(self):
         raise NotImplemented
 
+    def _Ep(self, M):
+        E = self.alpha * float(self.m ** 2) / sum(math.pow(2.0, -x) for x in M)
+        return (E - estimate_bias(E, self.p)) if E <= 5 * self.m else E
+
     def card(self, timestamp, window=None):
         """
         Returns the estimate of the cardinality at 'timestamp' using 'window'
@@ -138,15 +143,15 @@ class SlidingHyperLogLog(object):
         def max_r(l):
             return max(l) if l else 0
 
-        M = tuple(max_r([R for ts, R in lpfm if ts >= (timestamp - window)]) if lpfm else 0 for lpfm in self.LPFM)
-
-        E = self.alpha * float(self.m ** 2) / sum(math.pow(2.0, -x) for x in M)
-        Ep = (E - estimate_bias(E, self.p)) if E <= 5 * self.m else E
+        M = [max_r([R for ts, R in lpfm if ts >= (timestamp - window)]) if lpfm else 0 for lpfm in self.LPFM]
 
         #count number or registers equal to 0
         V = M.count(0)
-        H = self.m * math.log(self.m / float(V)) if V > 0 else Ep
-        return H if H <= get_treshold(self.p) else Ep
+        if V > 0:
+            H = self.m * math.log(self.m / float(V))
+            return H if H <= get_treshold(self.p) else self._Ep(M)
+        else:
+            return self._Ep(M)
 
     def card_wlist(self, timestamp, window_list):
         """
@@ -156,10 +161,12 @@ class SlidingHyperLogLog(object):
             if not 0 < window <= self.window:
                 raise ValueError('0 < window <= W')
 
-        tsl = sorted((timestamp - window, idx) for idx, window in enumerate(window_list))
-        M_list = list([] for _ in window_list)
+        tsl = [(timestamp - window, idx) for idx, window in enumerate(window_list)]
+        tsl.sort()
 
-        # Highly optimized code
+        M_list = [[] for _ in window_list]
+
+        # Highly optimized code (PyPy), but may be slow in CPython
         for lpfm in self.LPFM:
             R_max = 0
             _p = len(tsl) - 1
@@ -181,12 +188,11 @@ class SlidingHyperLogLog(object):
 
         res = []
         for M in M_list:
-            E = self.alpha * float(self.m ** 2) / sum(math.pow(2.0, -x) for x in M)
-            Ep = (E - estimate_bias(E, self.p)) if E <= 5 * self.m else E
-
             #count number or registers equal to 0
             V = M.count(0)
-            H = self.m * math.log(self.m / float(V)) if V > 0 else Ep
-            res.append(H if H <= get_treshold(self.p) else Ep)
+            if V > 0:
+                H = self.m * math.log(self.m / float(V))
+                res.append(H if H <= get_treshold(self.p) else self._Ep(M))
+            else:
+                res.append(self._Ep(M))
         return res
-
