@@ -4,10 +4,12 @@ Python implementation of the Hyper LogLog and Sliding Hyper LogLog cardinality c
 Installation:
 ============
 
-Use `pip install hyperloglog` to install from PyPI.
+Use ``pip install hyperloglog`` to install from PyPI.
 
 Usage:
 =====
+
+::
 
     import hyperloglog
     hll = hyperloglog.HyperLogLog(0.01)  # accept 1% counting error
@@ -19,6 +21,8 @@ Usage:
     print len(hll)  # 2
 
 If we add a further 1000 random strings (giving a total of 1002 strings) we'll have a count roughly within 1% of the true value, in this case it counts 1007 (within +/- 10.2 of the true value)
+
+::
 
     # add 1000 random 30 char strings to hll
     import random
