@@ -47,6 +47,13 @@ class SlidingHyperLogLog(object):
         self.p = p
         self.m = m
 
+    def __getstate__(self):
+        return dict([x, getattr(self, x)] for x in self.__slots__)
+
+    def __setstate__(self, d):
+        for key in d:
+            setattr(self, key, d[key])
+
     @classmethod
     def from_list(cls, lpfm, window):
         return cls(None, window, lpfm)
