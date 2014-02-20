@@ -5,6 +5,8 @@ from hll import HyperLogLog, get_alpha, get_rho
 from const import biasData, tresholdData, rawEstimateData
 import math
 import os
+import pickle
+
 
 class HyperLogLogTestCase(TestCase):
     def test_blobs(self):
@@ -92,3 +94,13 @@ class HyperLogLogTestCase(TestCase):
         b = HyperLogLog(0.01)
 
         self.assertRaises(ValueError, a.update, b)
+
+    def test_pickle(self):
+        a = HyperLogLog(0.05)
+        for x in range(100):
+            a.add(str(x))
+        b = pickle.loads(pickle.dumps(a))
+        self.assertEqual(a.M, b.M)
+        self.assertEqual(a.alpha, b.alpha)
+        self.assertEqual(a.p, b.p)
+        self.assertEqual(a.m, b.m)
