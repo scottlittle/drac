@@ -76,6 +76,13 @@ class HyperLogLog(object):
         self.m = 1 << p
         self.M = [ 0 for i in range(self.m) ]
 
+    def __getstate__(self):
+        return dict([x, getattr(self, x)] for x in self.__slots__)
+
+    def __setstate__(self, d):
+        for key in d:
+            setattr(self, key, d[key])
+
     def add(self, value):
         """
         Adds the item to the HyperLogLog

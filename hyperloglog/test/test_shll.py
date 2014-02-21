@@ -5,6 +5,8 @@ import math
 import time
 from unittest import TestCase
 from shll import SlidingHyperLogLog
+import pickle
+
 
 class SlidingHyperLogLogTestCase(TestCase):
     def test_init(self):
@@ -132,3 +134,15 @@ class SlidingHyperLogLogTestCase(TestCase):
         b = SlidingHyperLogLog(0.01, 100)
 
         self.assertRaises(ValueError, a.update, b)
+
+    def test_pickle(self):
+        a = SlidingHyperLogLog(0.05, 100)
+        for i in xrange(10000):
+            a.add(i, str('k1-%d' % i))
+        
+        b = pickle.loads(pickle.dumps(a))
+        self.assertEqual(a.window, b.window)
+        self.assertEqual(a.alpha, b.alpha)
+        self.assertEqual(a.p, b.p)
+        self.assertEqual(a.m, b.m)
+        self.assertEqual(a.LPFM, b.LPFM)
