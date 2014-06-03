@@ -7,6 +7,19 @@ from hashlib import sha1
 from const import rawEstimateData, biasData, tresholdData
 
 
+def bit_length(w):
+    return w.bit_length()
+
+
+def bit_length_emu(w):
+    return len(bin(w)) - 2 if w > 0 else 0
+
+
+# Workaround for python < 2.7
+if not hasattr(int, 'bit_length'):
+    bit_length = bit_length_emu
+
+
 def get_treshold(p):
     return tresholdData[p - 4]
 
@@ -40,7 +53,7 @@ def get_alpha(p):
 
 
 def get_rho(w, max_width):
-    rho = max_width - w.bit_length() + 1
+    rho = max_width - bit_length(w) + 1
 
     if rho <= 0:
         raise ValueError('w overflow')

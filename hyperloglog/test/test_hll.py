@@ -32,6 +32,24 @@ class HyperLogLogTestCase(TestCase):
         self.assertEqual(get_rho(1 << 31, 32), 1)
         self.assertRaises(ValueError, get_rho, 1 << 32, 32)
 
+    def test_rho_emu(self):
+        import hll
+        old = hll.bit_length
+        hll.bit_length = hll.bit_length_emu
+        try:
+            self.assertEqual(get_rho(0, 32), 33)
+            self.assertEqual(get_rho(1, 32), 32)
+            self.assertEqual(get_rho(2, 32), 31)
+            self.assertEqual(get_rho(3, 32), 31)
+            self.assertEqual(get_rho(4, 32), 30)
+            self.assertEqual(get_rho(5, 32), 30)
+            self.assertEqual(get_rho(6, 32), 30)
+            self.assertEqual(get_rho(7, 32), 30)
+            self.assertEqual(get_rho(1 << 31, 32), 1)
+            self.assertRaises(ValueError, get_rho, 1 << 32, 32)
+        finally:
+            hll.bit_length = old
+
     def test_init(self):
         s = HyperLogLog(0.05)
         self.assertEqual(s.p, 9)
