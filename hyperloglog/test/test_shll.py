@@ -4,7 +4,8 @@ import os
 import math
 import time
 from unittest import TestCase
-from shll import SlidingHyperLogLog
+from hyperloglog.shll import SlidingHyperLogLog
+from hyperloglog.compat import *
 import pickle
 
 
