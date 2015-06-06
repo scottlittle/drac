@@ -5,8 +5,8 @@ Sliding HyperLogLog
 import math
 import heapq
 from hashlib import sha1
-from hll import get_treshold, estimate_bias, get_alpha, get_rho
-
+from .hll import get_treshold, estimate_bias, get_alpha, get_rho
+from .compat import *
 
 class SlidingHyperLogLog(object):
     """
@@ -68,7 +68,7 @@ class SlidingHyperLogLog(object):
         # w = <x_{p}x_{p+1}..>
         # <t_i, rho(w)>
 
-        x = long(sha1(value).hexdigest()[:16], 16)
+        x = long(sha1(bytes(value.encode() if isinstance(value, unicode) else value)).hexdigest()[:16], 16)
         j = x & (self.m - 1)
         w = x >> self.p
         R = get_rho(w, 64 - self.p)

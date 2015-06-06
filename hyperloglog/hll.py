@@ -4,7 +4,8 @@ This module implements probabilistic data structure which is able to calculate t
 
 import math
 from hashlib import sha1
-from const import rawEstimateData, biasData, tresholdData
+from .const import rawEstimateData, biasData, tresholdData
+from .compat import *
 
 
 def bit_length(w):
@@ -106,7 +107,7 @@ class HyperLogLog(object):
         # w = <x_{p}x_{p+1}..>
         # M[j] = max(M[j], rho(w))
 
-        x = long(sha1(value).hexdigest()[:16], 16)
+        x = long(sha1(bytes(value.encode() if isinstance(value, unicode) else value)).hexdigest()[:16], 16)
         j = x & (self.m - 1)
         w = x >> self.p
 

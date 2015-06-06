@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 from unittest import TestCase
-from hll import HyperLogLog, get_alpha, get_rho
-from const import biasData, tresholdData, rawEstimateData
+from hyperloglog.hll import HyperLogLog, get_alpha, get_rho
+from hyperloglog.const import biasData, tresholdData, rawEstimateData
+from hyperloglog.compat import *
 import math
 import os
 import pickle
@@ -33,7 +34,7 @@ class HyperLogLogTestCase(TestCase):
         self.assertRaises(ValueError, get_rho, 1 << 32, 32)
 
     def test_rho_emu(self):
-        import hll
+        from hyperloglog import hll
         old = hll.bit_length
         hll.bit_length = hll.bit_length_emu
         try:
