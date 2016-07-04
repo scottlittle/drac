@@ -79,15 +79,15 @@ class SlidingHyperLogLog(object):
         tmp2 = list(heapq.merge(self.LPFM[j] if self.LPFM[j] is not None else [], [(timestamp, R)]))
 
         for t, R in reversed(tmp2):
-                if tmax is None:
-                    tmax = t
+            if tmax is None:
+                tmax = t
 
-                if t < (tmax - self.window):
-                    break
+            if t < (tmax - self.window):
+                break
 
-                if R > Rmax:
-                    tmp.append((t, R))
-                    Rmax = R
+            if Rmax is None or R > Rmax:
+                tmp.append((t, R))
+                Rmax = R
 
         tmp.reverse()
         self.LPFM[j] = tuple(tmp) if tmp else None
