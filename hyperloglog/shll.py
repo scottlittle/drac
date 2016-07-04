@@ -8,6 +8,7 @@ from hashlib import sha1
 from .hll import get_treshold, estimate_bias, get_alpha, get_rho
 from .compat import *
 
+
 class SlidingHyperLogLog(object):
     """
     Sliding HyperLogLog: Estimating cardinality in a data stream (Telecom ParisTech)
@@ -25,12 +26,12 @@ class SlidingHyperLogLog(object):
         self.window = window
 
         if lpfm is not None:
-             m = len(lpfm)
-             p = int(round(math.log(m, 2)))
+            m = len(lpfm)
+            p = int(round(math.log(m, 2)))
 
-             if (1 << p) != m:
-                 raise ValueError('List length is not power of 2')
-             self.LPFM = lpfm
+            if (1 << p) != m:
+                raise ValueError('List length is not power of 2')
+            self.LPFM = lpfm
 
         else:
             if not (0 < error_rate < 1):
@@ -114,7 +115,7 @@ class SlidingHyperLogLog(object):
                 if t < (tmax - self.window):
                     break
 
-                if R > Rmax:
+                if Rmax is None or R > Rmax:
                     tmp.append((t, R))
                     Rmax = R
 

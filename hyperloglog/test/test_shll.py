@@ -103,12 +103,12 @@ class SlidingHyperLogLogTestCase(TestCase):
                 a.add(i, os.urandom(20))
 
             ts = time.time()
-            l1 = [a.card(1.5 * card, w / 10.0) for w in range(1, card + 1, card / 10)]
+            l1 = [a.card(1.5 * card, w / 10.0) for w in range(1, card + 1, card // 10)]
             t1 = (time.time() - ts)
             ts = time.time()
-            l2 = a.card_wlist(1.5 * card, [ w / 10.0 for w in range(1, card + 1, card / 10)])
+            l2 = a.card_wlist(1.5 * card, [ w / 10.0 for w in range(1, card + 1, card // 10)])
             t2 = (time.time() - ts)
-            #print card, t1, t2
+            # print card, t1, t2
             self.assertEqual(l1, l2)
 
     def test_update(self):
