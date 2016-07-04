@@ -54,8 +54,8 @@ class SlidingHyperLogLogTestCase(TestCase):
                 s += a.card(int(time.time()))
 
             z = (float(s) / n - card) / (rel_err * card / math.sqrt(n))
-            self.assertLess(-1.96, z)
-            self.assertGreater(1.96, z)
+            self.assertLess(-3, z)
+            self.assertGreater(3, z)
 
     def test_calc_cardinality_sliding1(self):
         a = SlidingHyperLogLog(0.05, 100)
@@ -88,8 +88,8 @@ class SlidingHyperLogLogTestCase(TestCase):
 
             card_stored = min(card, 200000)
             z = (float(s) / n - card_stored) / (rel_err * card_stored / math.sqrt(n))
-            self.assertLess(-1.96, z)
-            self.assertGreater(1.96, z)
+            self.assertLess(-3, z)
+            self.assertGreater(3, z)
 
     def test_calc_cardinality_sliding3(self):
         clist = [30, 60, 200, 1000, 10000, 60000]
