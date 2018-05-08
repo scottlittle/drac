@@ -2,7 +2,7 @@
 
 from distutils.core import setup
 
-version = '0.0.11'
+version = '0.0.12'
 
 setup(
     name='hyperloglog',
