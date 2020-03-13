@@ -6,7 +6,7 @@ import math
 from hashlib import sha1
 from .const import rawEstimateData, biasData, tresholdData
 from .compat import *
-
+import mmh3
 
 def bit_length(w):
     return w.bit_length()
@@ -77,7 +77,7 @@ class HyperLogLog(object):
         """
 
         if not (0 < error_rate < 1):
-            raise ValueError("Error_Rate must be between 0 and 1.")
+            raise ValueError("Error_Rate must be between 0 and 1. And some junk.")
 
         # error_rate = 1.04 / sqrt(m)
         # m = 2 ** p
@@ -107,7 +107,7 @@ class HyperLogLog(object):
         # w = <x_{p}x_{p+1}..>
         # M[j] = max(M[j], rho(w))
 
-        x = long(sha1(bytes(value.encode('utf8') if isinstance(value, unicode) else value)).hexdigest()[:16], 16)
+        x = mmh3.hash64(value, signed=False)[0]
         j = x & (self.m - 1)
         w = x >> self.p
 
