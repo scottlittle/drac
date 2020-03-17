@@ -7,6 +7,7 @@ from hashlib import sha1
 from .const import rawEstimateData, biasData, tresholdData
 from .compat import *
 import mmh3
+import zlib
 
 def bit_length(w):
     return w.bit_length()
@@ -153,4 +154,17 @@ class HyperLogLog(object):
             return H if H <= get_treshold(self.p) else self._Ep()
         else:
             return self._Ep()
+    
+    def serialize_registers(self):
+        """
+        Returns compressed serialization of registers
+        """
 
+        return zlib.compress( bytes(self.M) )
+
+    @staticmethod
+    def deserialize_registers(M_):
+        """
+        Returns registers as list from compressed serialization
+        """
+        return list( zlib.decompress( M_ ) )
