@@ -78,7 +78,7 @@ class HyperLogLog(object):
         """
 
         if not (0 < error_rate < 1):
-            raise ValueError("Error_Rate must be between 0 and 1. And some junk.")
+            raise ValueError("Error_Rate must be between 0 and 1.")
 
         # error_rate = 1.04 / sqrt(m)
         # m = 2 ** p
@@ -163,8 +163,32 @@ class HyperLogLog(object):
         return zlib.compress( bytes(self.M) )
 
     @staticmethod
-    def deserialize_registers(M_):
+    def deserialize_registers(M):
         """
         Returns registers as list from compressed serialization
         """
-        return list( zlib.decompress( M_ ) )
+        return list( zlib.decompress( M ) )
+
+    def setstate_from_serialized(self, M, return_len=False):
+        """
+        Sets state from external serialized registers
+        """ 
+        #if m!=self.m:
+        #    raise ValueError('Counters precisions should be equal')
+
+        self.M = HyperLogLog.deserialize_registers( M )
+
+        if return_len:
+            return round( self.card() )
+
+    def setstate_from_serialized_list(self, others, return_len=False):
+        """
+        Merge multiple serialized registers and set state
+        """
+        others = map( HyperLogLog.deserialize_registers, others )
+        
+        self.M = [ max(i) for i in zip(*others) ]
+
+        if return_len:
+            return round( self.card() )
+
