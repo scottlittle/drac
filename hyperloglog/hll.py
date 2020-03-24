@@ -8,6 +8,10 @@ from .const import rawEstimateData, biasData, tresholdData
 from .compat import *
 import mmh3
 import zlib
+import pickle
+
+def max_min(x):
+    return sum(x) - min(x)
 
 def bit_length(w):
     return w.bit_length()
@@ -68,7 +72,7 @@ class HyperLogLog(object):
     HyperLogLog cardinality counter
     """
 
-    __slots__ = ('alpha', 'p', 'm', 'M')
+    __slots__ = ('alpha', 'p', 'm', 'M', 'k')
 
     def __init__(self, error_rate):
         """
@@ -90,6 +94,7 @@ class HyperLogLog(object):
         self.p = p
         self.m = 1 << p
         self.M = [ 0 for i in range(self.m) ]
+        self.k = [2**64]*4096
 
     def __getstate__(self):
         return dict([x, getattr(self, x)] for x in self.__slots__)
@@ -113,6 +118,14 @@ class HyperLogLog(object):
         w = x >> self.p
 
         self.M[j] = max(self.M[j], get_rho(w, 64 - self.p))
+        
+        # add to minhash counter too (k):
+
+        max_k = max(self.k)
+        index = k.index( max_k )
+
+        if x < max_k:
+            self.k[index] = x
 
     def update(self, *others):
         """
@@ -154,6 +167,13 @@ class HyperLogLog(object):
             return H if H <= get_treshold(self.p) else self._Ep()
         else:
             return self._Ep()
+
+    def serialize(self):
+        return zlib.compress( pickle.dumps( dict([x, getattr(self, x)] for x in self.__slots__) ) )
+
+    @staticmethod
+    def deserialize( x ):
+        return pickle.loads( zlib.decompress( x  ) )
     
     def serialize_registers(self):
         """
@@ -181,13 +201,18 @@ class HyperLogLog(object):
         if return_len:
             return round( self.card() )
 
-    def setstate_from_serialized_list(self, others, return_len=False):
+    def setstate_from_serialized_list(self, others, operation='or', return_len=False):
         """
         Merge multiple serialized registers and set state
         """
         others = map( HyperLogLog.deserialize_registers, others )
         
-        self.M = [ max(i) for i in zip(*others) ]
+        if operation=='or':
+            self.M = [ max(i) for i in zip(*others) ]
+        elif operation=='and':
+            self.M = [ max_min(i) for i in zip(*others) ]
+        else:
+            raise ValueError('operation must be set to "and" or "or"')
 
         if return_len:
             return round( self.card() )
