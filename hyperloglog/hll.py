@@ -94,7 +94,7 @@ class HyperLogLog(object):
         self.p = p
         self.m = 1 << p
         self.M = [ 0 for i in range(self.m) ]
-        self.k = [2**64]*4096
+        self.k = [2**64]*2048
 
     def __getstate__(self):
         return dict([x, getattr(self, x)] for x in self.__slots__)
@@ -121,11 +121,8 @@ class HyperLogLog(object):
         
         # add to minhash counter too (k):
 
-        max_k = max(self.k)
-        index = k.index( max_k )
-
-        if x < max_k:
-            self.k[index] = x
+        if x < self.k[-1]:
+            self.k = sorted( set( self.k + [x] ) )[0:2048]
 
     def update(self, *others):
         """
@@ -137,6 +134,8 @@ class HyperLogLog(object):
                 raise ValueError('Counters precisions should be equal')
 
         self.M = [max(*items) for items in zip(*([ item.M for item in others ] + [ self.M ]))]
+
+        self.k = sorted( set( [ *self.k, *[ i for item in others for i in item.k ] ] ) )[0:2048]
 
     def __eq__(self, other):
         if self.m != other.m:
@@ -216,4 +215,27 @@ class HyperLogLog(object):
 
         if return_len:
             return round( self.card() )
+    
+    @staticmethod
+    def jaccard(ks):
+        ks = [set(i) for i in ks]
+        return len( set.intersection(*ks) ) / len( set.union(*ks) )
 
+    @staticmethod
+    def get_max_card(x):
+        return max([ hll.card() for hll in x])
+
+    @staticmethod
+    def get_corrected_ks(x):
+        max_card = HyperLogLog.get_max_card( x )
+        return [ hll.k[:int(2048*hll.card()/max_card)] for hll in x  ]
+
+    @staticmethod
+    def get_corrected_jaccard(x):
+        return HyperLogLog.jaccard( HyperLogLog.get_corrected_ks(x) )
+
+    @staticmethod
+    def get_intersection_card(x):
+        hll_temp = HyperLogLog(0.01)
+        [hll_temp.update(hll) for hll in x]
+        return int( HyperLogLog.get_corrected_jaccard( x ) * hll_temp.card() )
