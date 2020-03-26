@@ -9,6 +9,7 @@ from .compat import *
 import mmh3
 import zlib
 import pickle
+from sortedcontainers import SortedSet
 
 def max_min(x):
     return sum(x) - min(x)
@@ -72,9 +73,9 @@ class HyperLogLog(object):
     HyperLogLog cardinality counter
     """
 
-    __slots__ = ('alpha', 'p', 'm', 'M', 'k')
+    __slots__ = ('alpha', 'p', 'm', 'M', 'k', 'k_len')
 
-    def __init__(self, error_rate):
+    def __init__(self, error_rate, minhash_counter_len=2048):
         """
         Implementes a HyperLogLog
 
@@ -94,7 +95,8 @@ class HyperLogLog(object):
         self.p = p
         self.m = 1 << p
         self.M = [ 0 for i in range(self.m) ]
-        self.k = [2**64]*2048
+        self.k = SortedSet( range( 2**64, 2**64 + minhash_counter_len ) )
+        self.k_len = minhash_counter_len
 
     def __getstate__(self):
         return dict([x, getattr(self, x)] for x in self.__slots__)
@@ -122,7 +124,8 @@ class HyperLogLog(object):
         # add to minhash counter too (k):
 
         if x < self.k[-1]:
-            self.k = sorted( set( self.k + [x] ) )[0:2048]
+            self.k.add(x)
+            self.k.pop();
 
     def update(self, *others):
         """
@@ -135,7 +138,7 @@ class HyperLogLog(object):
 
         self.M = [max(*items) for items in zip(*([ item.M for item in others ] + [ self.M ]))]
 
-        self.k = sorted( set( [ *self.k, *[ i for item in others for i in item.k ] ] ) )[0:2048]
+        self.k = SortedSet( SortedSet( [ *self.k, *[ i for item in others for i in item.k ] ] )[0:self.k_len] )
 
     def __eq__(self, other):
         if self.m != other.m:
@@ -218,24 +221,40 @@ class HyperLogLog(object):
     
     @staticmethod
     def jaccard(ks):
+        '''
+        Gets jaccard index of several minhash counters
+        '''
         ks = [set(i) for i in ks]
         return len( set.intersection(*ks) ) / len( set.union(*ks) )
 
     @staticmethod
     def get_max_card(x):
+        '''
+        Calculates max cardinality of several hlls
+        '''
         return max([ hll.card() for hll in x])
 
     @staticmethod
     def get_corrected_ks(x):
+        '''
+        Returns the corrected minhash counters to reflect a "normalized" k density (i.e., hll.k_len / hll.card() )
+        '''
         max_card = HyperLogLog.get_max_card( x )
-        return [ hll.k[:int(2048*hll.card()/max_card)] for hll in x  ]
+        k_len = x[0].k_len
+        return [ hll.k[0:int(k_len*hll.card()/max_card)] for hll in x  ]
 
     @staticmethod
     def get_corrected_jaccard(x):
+        '''
+        Gets the jaccard index after correcting the minhash counter density
+        '''
         return HyperLogLog.jaccard( HyperLogLog.get_corrected_ks(x) )
 
     @staticmethod
     def get_intersection_card(x):
+        '''
+        Gets the cardinality of the intersection of multiple hlls
+        '''
         hll_temp = HyperLogLog(0.01)
         [hll_temp.update(hll) for hll in x]
         return int( HyperLogLog.get_corrected_jaccard( x ) * hll_temp.card() )
