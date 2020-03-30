@@ -17,31 +17,25 @@ def max_min(x):
 def bit_length(w):
     return w.bit_length()
 
-
 def bit_length_emu(w):
     return len(bin(w)) - 2 if w > 0 else 0
-
 
 # Workaround for python < 2.7
 if not hasattr(int, 'bit_length'):
     bit_length = bit_length_emu
 
-
 def get_treshold(p):
     return tresholdData[p - 4]
-
 
 def estimate_bias(E, p):
     bias_vector = biasData[p - 4]
     nearest_neighbors = get_nearest_neighbors(E, rawEstimateData[p - 4])
     return sum([float(bias_vector[i]) for i in nearest_neighbors]) / len(nearest_neighbors)
 
-
 def get_nearest_neighbors(E, estimate_vector):
     distance_map = [((E - float(val)) ** 2, idx) for idx, val in enumerate(estimate_vector)]
     distance_map.sort()
     return [idx for dist, idx in distance_map[:6]]
-
 
 def get_alpha(p):
     if not (4 <= p <= 16):
@@ -57,7 +51,6 @@ def get_alpha(p):
         return 0.709
 
     return 0.7213 / (1.0 + 1.079 / (1 << p))
-
 
 def get_rho(w, max_width):
     rho = max_width - bit_length(w) + 1
@@ -75,7 +68,7 @@ class HyperLogLog(object):
 
     __slots__ = ('alpha', 'p', 'm', 'M', 'k', 'k_len')
 
-    def __init__(self, error_rate, minhash_counter_len=2048):
+    def __init__(self, error_rate, minhash_counter_len=2**15):
         """
         Implementes a HyperLogLog
 
@@ -95,7 +88,7 @@ class HyperLogLog(object):
         self.p = p
         self.m = 1 << p
         self.M = [ 0 for i in range(self.m) ]
-        self.k = SortedSet( range( 2**64, 2**64 + minhash_counter_len ) )
+        self.k = SortedSet( range( 2**64, 2**64 + minhash_counter_len ) ) #every register gets a unique placeholder value
         self.k_len = minhash_counter_len
 
     def __getstate__(self):
@@ -120,7 +113,7 @@ class HyperLogLog(object):
         w = x >> self.p
 
         self.M[j] = max(self.M[j], get_rho(w, 64 - self.p))
-        
+
         # add to minhash counter too (k):
 
         if x < self.k[-1]:
@@ -171,12 +164,18 @@ class HyperLogLog(object):
             return self._Ep()
 
     def serialize(self):
+        '''
+        Serializes hll object as dictionary using compressed bytes string
+        '''
         return zlib.compress( pickle.dumps( dict([x, getattr(self, x)] for x in self.__slots__) ) )
 
     @staticmethod
     def deserialize( x ):
+        '''
+        Get back the dictionary saved by the serialize method
+        '''
         return pickle.loads( zlib.decompress( x  ) )
-    
+
     def serialize_registers(self):
         """
         Returns compressed serialization of registers
@@ -194,7 +193,7 @@ class HyperLogLog(object):
     def setstate_from_serialized(self, M, return_len=False):
         """
         Sets state from external serialized registers
-        """ 
+        """
         #if m!=self.m:
         #    raise ValueError('Counters precisions should be equal')
 
@@ -208,7 +207,7 @@ class HyperLogLog(object):
         Merge multiple serialized registers and set state
         """
         others = map( HyperLogLog.deserialize_registers, others )
-        
+
         if operation=='or':
             self.M = [ max(i) for i in zip(*others) ]
         elif operation=='and':
@@ -218,7 +217,7 @@ class HyperLogLog(object):
 
         if return_len:
             return round( self.card() )
-    
+
     @staticmethod
     def jaccard(ks):
         '''
@@ -227,6 +226,13 @@ class HyperLogLog(object):
         ks = [set(i) for i in ks]
         return len( set.intersection(*ks) ) / len( set.union(*ks) )
 
+    @staticmethod
+    def get_min_card(x):
+        '''
+        Calculates min cardinality of several hlls
+        '''
+        return min([ hll.card() for hll in x])
+    
     @staticmethod
     def get_max_card(x):
         '''
@@ -241,7 +247,7 @@ class HyperLogLog(object):
         '''
         max_card = HyperLogLog.get_max_card( x )
         k_len = x[0].k_len
-        return [ hll.k[0:int(k_len*hll.card()/max_card)] for hll in x  ]
+        return [ [i for i in hll.k if i<2**64][ 0:int( k_len * hll.card() / max_card ) ] for hll in x  ]
 
     @staticmethod
     def get_corrected_jaccard(x):
@@ -258,3 +264,7 @@ class HyperLogLog(object):
         hll_temp = HyperLogLog(0.01)
         [hll_temp.update(hll) for hll in x]
         return int( HyperLogLog.get_corrected_jaccard( x ) * hll_temp.card() )
+
+    @staticmethod
+    def containment(x):
+        return HyperLogLog.get_intersection_card(x) / HyperLogLog.get_min_card(x)
