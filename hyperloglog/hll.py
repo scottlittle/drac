@@ -66,9 +66,9 @@ class HyperLogLog(object):
     HyperLogLog cardinality counter
     """
 
-    __slots__ = ('alpha', 'p', 'm', 'M', 'k', 'k_len')
+    __slots__ = ('alpha', 'p', 'm', 'M', 'k', 'k_len', 'error_rate')
 
-    def __init__(self, error_rate, minhash_counter_len=2**15):
+    def __init__(self, error_rate, minhash_counter_len=2**16):
         """
         Implementes a HyperLogLog
 
@@ -90,6 +90,7 @@ class HyperLogLog(object):
         self.M = [ 0 for i in range(self.m) ]
         self.k = SortedSet( range( 2**64, 2**64 + minhash_counter_len ) ) #every register gets a unique placeholder value
         self.k_len = minhash_counter_len
+        self.error_rate = error_rate
 
     def __getstate__(self):
         return dict([x, getattr(self, x)] for x in self.__slots__)
@@ -176,48 +177,6 @@ class HyperLogLog(object):
         '''
         return pickle.loads( zlib.decompress( x  ) )
 
-    def serialize_registers(self):
-        """
-        Returns compressed serialization of registers
-        """
-
-        return zlib.compress( bytes(self.M) )
-
-    @staticmethod
-    def deserialize_registers(M):
-        """
-        Returns registers as list from compressed serialization
-        """
-        return list( zlib.decompress( M ) )
-
-    def setstate_from_serialized(self, M, return_len=False):
-        """
-        Sets state from external serialized registers
-        """
-        #if m!=self.m:
-        #    raise ValueError('Counters precisions should be equal')
-
-        self.M = HyperLogLog.deserialize_registers( M )
-
-        if return_len:
-            return round( self.card() )
-
-    def setstate_from_serialized_list(self, others, operation='or', return_len=False):
-        """
-        Merge multiple serialized registers and set state
-        """
-        others = map( HyperLogLog.deserialize_registers, others )
-
-        if operation=='or':
-            self.M = [ max(i) for i in zip(*others) ]
-        elif operation=='and':
-            self.M = [ max_min(i) for i in zip(*others) ]
-        else:
-            raise ValueError('operation must be set to "and" or "or"')
-
-        if return_len:
-            return round( self.card() )
-
     @staticmethod
     def jaccard(ks):
         '''
@@ -261,10 +220,15 @@ class HyperLogLog(object):
         '''
         Gets the cardinality of the intersection of multiple hlls
         '''
-        hll_temp = HyperLogLog(0.01)
+        hll_temp = HyperLogLog( x[0].error_rate )
         [hll_temp.update(hll) for hll in x]
         return int( HyperLogLog.get_corrected_jaccard( x ) * hll_temp.card() )
 
     @staticmethod
     def containment(x):
-        return HyperLogLog.get_intersection_card(x) / HyperLogLog.get_min_card(x)
+        '''
+        Input: list of hll objects
+        Output: list of containment of all objects to each hll object
+        '''
+        int_card = HyperLogLog.get_intersection_card(x)
+        return [int_card / len(i) for i in x]
