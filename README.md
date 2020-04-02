@@ -1,4 +1,4 @@
-Python implementation of the HyperLogLog and Sliding HyperLogLog cardinality counter algorithms. 
+Python implementation of the HyperLogLog with intersection support. 
 --------------------------------------------------------------------------------------------------
 
 This is forked from `svpcom/hyperloglog` and extended to include functionality such as intersections and serialization.  This implementation of HyperLogLog was chosen among several Python implementations because it seemed simple and straightforward, allowing one to extend it very easily.  My goal is to modify this package to work with Dask, in which I will upload an example Jupyter notebook soon.
@@ -6,6 +6,7 @@ This is forked from `svpcom/hyperloglog` and extended to include functionality s
 ### Installation
 
 ~~Use ``pip install hyperloglog`` to install from PyPI.~~
+For development installation, use: `pip install -e hyperloglog`
 
 ### Usage
 
