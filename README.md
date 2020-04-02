@@ -5,7 +5,7 @@ This is forked from `svpcom/hyperloglog` and extended to include functionality s
 
 ### Installation
 
-~~Use ``pip install hyperloglog`` to install from PyPI.~~
+~~Use ``pip install hyperloglog`` to install from PyPI.~~ <br>
 For development installation, use: `pip install -e hyperloglog`
 
 ### Usage
@@ -32,6 +32,10 @@ print len(hll)  # 1007
 
 ### Changes:
 
+- Added intersection support
+- Added serialization support
+
+From `svpcom/hyperloglog`:
 - Added Sliding window HLL version
 - Added bias correction from HLL++
 
