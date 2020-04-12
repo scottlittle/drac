@@ -6,9 +6,9 @@ This is forked from `svpcom/hyperloglog` and extended to include functionality s
 ### Installation
 
 ~~Use ``pip install hyperloglog`` to install from PyPI.~~ <br>
-For development installation, use: 
-`git clone https://github.com/scottlittle/hyperloglog`
-`pip install -e hyperloglog`
+For development installation, use: <br>
+`git clone https://github.com/scottlittle/hyperloglog` <br>
+`pip install -e hyperloglog` <br>
 
 ### Usage
 
