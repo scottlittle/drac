@@ -169,7 +169,7 @@ class HyperLogLog(object):
         '''
         Serializes hll object as dictionary using compressed bytes string
         '''
-        return base64.b64encode( zlib.compress( pickle.dumps( dict([x, getattr(self, x)] for x in self.__slots__) ) ).decode('utf-8') )
+        return base64.b64encode( zlib.compress( pickle.dumps( dict([x, getattr(self, x)] for x in self.__slots__) ) ) )
 
     @staticmethod
     def deserialize( x ):
