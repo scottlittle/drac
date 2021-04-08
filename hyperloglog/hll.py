@@ -9,6 +9,7 @@ from .compat import *
 import mmh3
 import zlib
 import pickle
+import base64
 from sortedcontainers import SortedSet
 
 def max_min(x):
@@ -168,14 +169,14 @@ class HyperLogLog(object):
         '''
         Serializes hll object as dictionary using compressed bytes string
         '''
-        return zlib.compress( pickle.dumps( dict([x, getattr(self, x)] for x in self.__slots__) ) )
+        return base64.b64encode( zlib.compress( pickle.dumps( dict([x, getattr(self, x)] for x in self.__slots__) ) ).decode('utf-8') )
 
     @staticmethod
     def deserialize( x ):
         '''
         Get back the dictionary saved by the serialize method
         '''
-        return pickle.loads( zlib.decompress( x  ) )
+        return pickle.loads( zlib.decompress( base64.b64decode( x ) ) )
 
     @staticmethod
     def jaccard(ks):
