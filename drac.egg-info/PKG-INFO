@@ -1,6 +1,6 @@
 Metadata-Version: 1.2
 Name: drac
-Version: 0.0.1
+Version: 0.1.0
 Summary: HyperLogLog cardinality counter
 Home-page: https://github.com/scottlittle/drac
 Author: Scott Little
@@ -11,6 +11,7 @@ License: LGPL 2.1 or later
 Description: 
         Python implementation of the HyperLogLog cardinality estimation (counting 1..2..3, hahaha) with support for intersections.
         
+        Originally forked from svpcom/hyperloglog. See these references for math background:
         http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf
         http://hal.archives-ouvertes.fr/docs/00/46/53/13/PDF/sliding_HyperLogLog.pdf
         http://research.google.com/pubs/pub40671.html

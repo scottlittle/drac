@@ -11,7 +11,7 @@ setup(
     maintainer_email='scott.alan.little@gmail.com',
     author='Scott Little',
     author_email='scott.alan.little@gmail.com',
-    packages=['drac''drac.test'],
+    packages=['drac','drac.test'],
     description='HyperLogLog cardinality counter',
     url='https://github.com/scottlittle/drac',
     license='LGPL 2.1 or later',

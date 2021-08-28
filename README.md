@@ -33,6 +33,12 @@ import string
 print( len(hll)  )# 1007
 ```
 
+### To-do:
+
+- Add convenience functions for serialization and deserialization
+- Add examples for serialization and deserialization
+- Clean up odds and ends
+
 ### Changes:
 
 - Added intersection support
@@ -40,7 +46,6 @@ print( len(hll)  )# 1007
 - Removed Python 2 support
 
 From `svpcom/hyperloglog`:
-- Added Sliding window HLL version
 - Added bias correction from HLL++
 
 ### References:
