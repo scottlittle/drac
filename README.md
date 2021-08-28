@@ -1,7 +1,7 @@
 Python implementation of the HyperLogLog with intersection support. 
 --------------------------------------------------------------------------------------------------
 
-This is forked from `svpcom/hyperloglog` and extended to include functionality such as intersections and serialization.  This implementation of HyperLogLog was chosen among several Python implementations because it seemed simple and straightforward, allowing one to extend it very easily.  My goal is to modify this package to work with Dask, in which I will upload an example Jupyter notebook soon.  See [my blog post](http://scottlittle.org/Cardinality-estimation-in-Parallel/) for more info.
+This is forked from `svpcom/hyperloglog` and extended to include functionality such as intersections and serialization.  This implementation of HyperLogLog was chosen among several Python implementations because it seemed simple and straightforward, allowing one to extend it very easily.  My goal is to modify this package to work with Dask, which is demonstrated for a large divvy dataset in `examples/hll intersection with dask.ipynb`.  See [my blog post](http://scottlittle.org/Cardinality-estimation-in-Parallel/) for more info.
 
 ### Installation
 
