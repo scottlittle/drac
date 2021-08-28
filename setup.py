@@ -2,23 +2,22 @@
 
 from distutils.core import setup
 
-version = '0.0.12'
+version = '0.0.1'
 
 setup(
-    name='hyperloglog',
+    name='drac',
     version=version,
-    maintainer='Vasily Evseenko',
-    maintainer_email='svpcom@gmail.com',
-    author='Vasily Evseenko',
-    author_email='svpcom@gmail.com',
-    packages=['hyperloglog', 'hyperloglog.test'],
+    maintainer='Scott Little',
+    maintainer_email='scott.alan.little@gmail.com',
+    author='Scott Little',
+    author_email='scott.alan.little@gmail.com',
+    packages=['drac', 'drac.test'],
     description='HyperLogLog cardinality counter',
-    url='https://github.com/svpcom/hyperloglog',
+    url='https://github.com/scottlittle/drac',
     license='LGPL 2.1 or later',
     long_description=\
 """
-Python implementation of the Hyper LogLog and Sliding Hyper LogLog cardinality counter
-algorithms. Added bias correction from HLL++.
+Python implementation of the HyperLogLog cardinality estimation (counting 1..2..3, hahaha) with support for intersections.
 
 http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf
 http://hal.archives-ouvertes.fr/docs/00/46/53/13/PDF/sliding_HyperLogLog.pdf
