@@ -7,14 +7,14 @@ This is forked from `svpcom/hyperloglog` and extended to include functionality s
 
 ~~Use ``pip install hyperloglog`` to install from PyPI.~~ <br>
 For development installation, use: <br>
-`git clone https://github.com/scottlittle/hyperloglog` <br>
-`pip install -e hyperloglog` <br>
+`git clone https://github.com/scottlittle/drac` <br>
+`pip install -e drac` <br>
 
 ### Usage
 
 ```python
-import hyperloglog
-hll = hyperloglog.HyperLogLog(0.01)  # accept 1% counting error
+import drac
+hll = drac.HyperLogLog(0.01)  # accept 1% counting error
 hll.add("hello")
 print( len(hll) )  # 1
 hll.add("hello")
