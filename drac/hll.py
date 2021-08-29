@@ -5,7 +5,6 @@ This module implements probabilistic data structure which is able to calculate t
 import math
 from hashlib import sha1
 from .const import rawEstimateData, biasData, tresholdData
-from .compat import *
 import mmh3
 import zlib
 import pickle
