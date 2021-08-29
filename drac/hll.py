@@ -170,6 +170,12 @@ class HyperLogLog(object):
         '''
         return base64.b64encode( zlib.compress( pickle.dumps( dict([x, getattr(self, x)] for x in self.__slots__) ) ) ).decode('utf-8')
 
+    def setstate_from_serialization( self, x ):
+        '''
+        Convienience function for setting state from a serialization
+        '''
+        return self.__setstate__( HyperLogLog.deserialize( x ) )
+    
     @staticmethod
     def deserialize( x ):
         '''
