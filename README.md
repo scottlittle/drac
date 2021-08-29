@@ -9,9 +9,13 @@ This implementation of HyperLogLog is extended from `svpcom/hyperloglog` to incl
 
 ### Installation
 
-Use ``pip install drac`` to install from PyPI. <br>
+To install from PyPI, simply use: <br>
+```bash
+pip install drac
+```
+which only requires `mmh3`, a Python wrapper for the very fast MurmurHash3 C++ implementation; and also `sortedcontainers`, a pure Python (but still very quick) implementation for sorted sets. <br>
 <br>
-For development installation, use: <br>
+For the development installation, use: <br>
 `git clone https://github.com/scottlittle/drac` <br>
 `cd drac` <br>
 `pip install -e . -r requirements.txt` <br>
@@ -26,7 +30,7 @@ print( len(hll) )  # 1
 hll.add("hello")
 print( len(hll) ) # 1 as items aren't added more than once
 hll.add("hello again")
-print( len(hll)  )# 2
+print( len(hll) )# 2
 ```
 If we add a further 1000 random strings (giving a total of 1002 strings) we'll have a count roughly within 1% of the true value, in this case it counts 1007 (within +/- 10.2 of the true value)
 
@@ -35,7 +39,7 @@ If we add a further 1000 random strings (giving a total of 1002 strings) we'll h
 import random
 import string
 [hll.add("".join([string.ascii_letters[random.randint(0, len(string.ascii_letters)-1)] for n in range(30)])) for m in range(1000)]  
-print( len(hll)  )# 1007
+print( len(hll)  )# ~1000
 ```
 
 ### To-do:
