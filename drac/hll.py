@@ -68,7 +68,7 @@ class HyperLogLog(object):
 
     __slots__ = ('alpha', 'p', 'm', 'M', 'k', 'k_len', 'error_rate')
 
-    def __init__(self, error_rate, minhash_counter_len=2**16):
+    def __init__(self, error_rate=0.01, minhash_counter_len=2**16):
         """
         Implementes a HyperLogLog
 
