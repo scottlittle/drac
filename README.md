@@ -5,7 +5,8 @@ This is forked from `svpcom/hyperloglog` and extended to include functionality s
 
 ### Installation
 
-~~Use ``pip install drac`` to install from PyPI.~~ <br>
+Use ``pip install drac`` to install from PyPI. <br>
+<br>
 For development installation, use: <br>
 `git clone https://github.com/scottlittle/drac` <br>
 `cd drac` <br>
