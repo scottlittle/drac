@@ -24,7 +24,7 @@ For the development installation, use: <br>
 
 ```python
 import drac
-hll = drac.HyperLogLog(0.01)  # accept 1% counting error
+hll = drac.HyperLogLog()  # accept default of 1% counting error rate
 hll.add("hello")
 print( len(hll) )  # 1
 hll.add("hello")
