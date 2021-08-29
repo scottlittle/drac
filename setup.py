@@ -2,7 +2,7 @@
 
 from distutils.core import setup
 
-version = '0.1.1'
+version = '0.1.3'
 
 setup(
     name='drac',
@@ -14,6 +14,14 @@ setup(
     packages=['drac','drac.test'],
     description='HyperLogLog cardinality counter',
     url='https://github.com/scottlittle/drac',
+    install_requires=[
+        'mmh3>=3.0.0',
+        'sortedcontainers>=2.4.0',
+    ],
+    setup_requires=[
+        'mmh3>=3.0.0',
+        'sortedcontainers>=2.4.0',
+    ],
     license='LGPL 2.1 or later',
     long_description=\
 """
