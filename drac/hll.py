@@ -3,7 +3,6 @@ This module implements probabilistic data structure which is able to calculate t
 """
 
 import math
-from hashlib import sha1
 from .const import rawEstimateData, biasData, tresholdData
 import mmh3
 import zlib
@@ -40,24 +39,18 @@ def get_nearest_neighbors(E, estimate_vector):
 def get_alpha(p):
     if not (4 <= p <= 16):
         raise ValueError("p=%d should be in range [4 : 16]" % p)
-
     if p == 4:
         return 0.673
-
     if p == 5:
         return 0.697
-
     if p == 6:
         return 0.709
-
     return 0.7213 / (1.0 + 1.079 / (1 << p))
 
 def get_rho(w, max_width):
     rho = max_width - bit_length(w) + 1
-
     if rho <= 0:
         raise ValueError('w overflow')
-
     return rho
 
 
@@ -115,8 +108,7 @@ class HyperLogLog(object):
 
         self.M[j] = max(self.M[j], get_rho(w, 64 - self.p))
 
-        # add to minhash counter too (k):
-
+        # add to minhash counter too (k) while keeping length constant
         if x < self.k[-1]:
             self.k.add(x)
             self.k.pop();
@@ -131,13 +123,11 @@ class HyperLogLog(object):
                 raise ValueError('Counters precisions should be equal')
 
         self.M = [max(*items) for items in zip(*([ item.M for item in others ] + [ self.M ]))]
-
         self.k = SortedSet( SortedSet( [ *self.k, *[ i for item in others for i in item.k ] ] )[0:self.k_len] )
 
     def __eq__(self, other):
         if self.m != other.m:
             raise ValueError('Counters precisions should be equal')
-
         return self.M == other.M
 
     def __ne__(self, other):
