@@ -4,7 +4,7 @@ A Python implementation of HyperLogLog with intersection support.
 
 ### About
 
-This implementation of HyperLogLog is extended from `svpcom/hyperloglog` to include functionality such as intersections between multiple HyperLogLog objects and serialization of HyperLogLog objects for persistence. My goal is to modify this package to be able to look explore relationships in data, say through a dashboard app, even when the dataset is large (aka big data). This was explored within Dask, a Python based map-reduce architecture, which is demonstrated for a large divvy dataset in `examples/hll intersection with dask.ipynb`.  See [my blog post](http://scottlittle.org/Cardinality-estimation-in-Parallel/) for more info.
+This implementation of HyperLogLog is extended from `svpcom/hyperloglog` to include functionality such as intersections between multiple HyperLogLog objects and serialization of HyperLogLog objects for persistence. My goal is to modify this package to be able to look explore relationships in data, say through a dashboard app, even when the dataset is large (aka big data). This was explored within Dask, a Python based map-reduce architecture, which is demonstrated for a large divvy dataset in `examples/hll intersection with dask.ipynb`.  See [my blog post](http://scottlittle.org/Cardinality-estimation-in-Parallel/) for more info, such as how this might be used in a realtime app.
 
 ### Installation
 
@@ -60,5 +60,5 @@ From `svpcom/hyperloglog`:
 #### HLL
 1. http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf
 2. http://research.google.com/pubs/pub40671.html
-### Intersections
+#### Intersections
 1. https://arxiv.org/pdf/1710.08436.pdf
