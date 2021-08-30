@@ -3,7 +3,6 @@
 from unittest import TestCase
 from hyperloglog.hll import HyperLogLog, get_alpha, get_rho
 from hyperloglog.const import biasData, tresholdData, rawEstimateData
-from hyperloglog.compat import *
 import math
 import os
 import pickle
