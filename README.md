@@ -62,3 +62,4 @@ From `svpcom/hyperloglog`:
 2. http://research.google.com/pubs/pub40671.html
 #### Intersections
 1. https://arxiv.org/pdf/1710.08436.pdf
+2. http://infolab.stanford.edu/%7Eullman/mmds/ch3.pdf
