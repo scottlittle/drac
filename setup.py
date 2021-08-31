@@ -25,7 +25,6 @@ setup(
     license='LGPL 2.1 or later',
     classifiers=[
     'Development Status :: 3 - Alpha',     
-    'License :: OSI Approved :: LGPL 2.1 or later',
     'Programming Language :: Python :: 3',      
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
