@@ -44,7 +44,11 @@ print( len(hll)  )# ~1000
 
 ### Serialization
 ```python
-hll_string = hll.serialize()
+import drac
+hll = drac.HyperLogLog()  # accept default of 1% counting error rate
+hll.add("hello")
+
+hll_string = hll.serialize() # create serialization string
 
 with open('hll_string.txt', 'w') as f:  # persist string to disk
     f.write( hll_string )
@@ -52,10 +56,10 @@ with open('hll_string.txt', 'w') as f:  # persist string to disk
 with open('hll_string.txt', 'r') as f:  # read string back in
     hll_string_copy = f.read()
     
-hll_empty = HyperLogLog() # create new empty object
-hll_empty.setstate_from_serialization( hll_copy_string )
+hll_empty = drac.HyperLogLog() # create new empty object
+hll_empty.setstate_from_serialization( hll_string_copy )
 
-assert hll == hll_empty  # true
+assert hll == hll_empty  # copy is same as original
 ```
 
 ## Updates
