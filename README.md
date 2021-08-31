@@ -2,11 +2,11 @@
 
 A Python implementation of HyperLogLog with intersection support. 
 
-### About
+## About
 
 This implementation of HyperLogLog is extended from `svpcom/hyperloglog` to include functionality such as intersections between multiple HyperLogLog objects and serialization of HyperLogLog objects for persistence. My goal is to modify this package to be able to look explore relationships in data, say through a dashboard app, even when the dataset is large (aka big data). This was explored within Dask, a Python based map-reduce architecture, which is demonstrated for a large divvy dataset in `examples/hll intersection with dask.ipynb`.  See [my blog post](http://scottlittle.org/Cardinality-estimation-in-Parallel/) for more info, such as how this might be used in a realtime app.
 
-### Installation
+## Installation
 
 To install from PyPI, simply use: <br>
 ```bash
@@ -19,7 +19,8 @@ For the development installation, use: <br>
 `cd drac` <br>
 `pip install -e . -r requirements.txt` <br>
 
-### Usage
+## Usage
+### Adding unique elements to HLL objects
 
 ```python
 import drac
@@ -27,9 +28,9 @@ hll = drac.HyperLogLog()  # accept default of 1% counting error rate
 hll.add("hello")
 print( len(hll) )  # 1
 hll.add("hello")
-print( len(hll) ) # 1 as items aren't added more than once
+print( len(hll) )  # 1 as items aren't added more than once
 hll.add("hello again")
-print( len(hll) )# 2
+print( len(hll) )  # 2
 ```
 If we add a further 1000 random strings (giving a total of 1002 strings) we'll have a count roughly within 1% of the true value, in this case it counts 1007 (within +/- 10.2 of the true value)
 
@@ -41,12 +42,23 @@ import string
 print( len(hll)  )# ~1000
 ```
 
-### To-do:
+### Serialization
+```python
+hll_string = hll.serialize()
 
-- Add convenience functions for serialization and deserialization
-- Add examples for serialization and deserialization
-- Clean up odds and ends
+with open('hll_string.txt', 'w') as f:  # persist string to disk
+    f.write( hll_string )
+    
+with open('hll_string.txt', 'r') as f:  # read string back in
+    hll_string_copy = f.read()
+    
+hll_empty = HyperLogLog() # create new empty object
+hll_empty.setstate_from_serialization( hll_copy_string )
 
+assert hll == hll_empty  # true
+```
+
+## Updates
 ### Changes:
 
 - Added intersection support
@@ -55,11 +67,16 @@ print( len(hll)  )# ~1000
 
 From `svpcom/hyperloglog`:
 - Added bias correction from HLL++
+- 
+### To-do:
+- Add convenience functions for serialization and deserialization
+- Add examples for serialization and deserialization
+- Clean up odds and ends
 
-### References:
-#### HLL
+## References:
+### HLL
 1. http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf
 2. http://research.google.com/pubs/pub40671.html
-#### Intersections
+### Intersections
 1. https://arxiv.org/pdf/1710.08436.pdf
 2. http://infolab.stanford.edu/%7Eullman/mmds/ch3.pdf
