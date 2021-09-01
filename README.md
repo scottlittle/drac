@@ -24,6 +24,7 @@ For the development installation, use: <br>
 
 ```python
 import drac
+
 hll = drac.HyperLogLog()  # accept default of 1% counting error rate
 hll.add("hello")
 print( len(hll) )  # 1
@@ -45,6 +46,7 @@ print( len(hll)  )# ~1000
 ### Serialization
 ```python
 import drac
+
 hll = drac.HyperLogLog()  # accept default of 1% counting error rate
 hll.add("hello")
 
@@ -60,6 +62,24 @@ hll_empty = drac.HyperLogLog() # create new empty object
 hll_empty.setstate_from_serialization( hll_string_copy )
 
 assert hll == hll_empty  # copy is same as original
+```
+
+### Intersection statistics
+```python
+import drac
+
+h1 = drac.HyperLogLog()
+h2 = drac.HyperLogLog()
+h3 = drac.HyperLogLog()
+
+[ h1.add( str(i) ) for i in range(0,1000) ];
+[ h2.add( str(i) ) for i in range(0,500) ];
+[ h3.add( str(i) ) for i in range(250,750) ];
+
+print( drac.HyperLogLog.get_corrected_jaccard( [h1,h2] ) ) # 0.5
+print( drac.HyperLogLog.get_corrected_jaccard( [h2,h3] ) ) # 0.33...
+print( drac.HyperLogLog.get_corrected_jaccard( [h1,h3] ) ) # 0.5
+print( drac.HyperLogLog.get_corrected_jaccard( [h1,h2,h3] ) ) # 0.25
 ```
 
 ## Updates
