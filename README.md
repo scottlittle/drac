@@ -91,10 +91,11 @@ print( drac.HyperLogLog.get_corrected_jaccard( [h1,h2,h3] ) ) # 0.25
 
 From `svpcom/hyperloglog`:
 - Added bias correction from HLL++
-
-### To-do:
 - Add convenience functions for serialization and deserialization
 - Add examples for serialization and deserialization
+
+### To-do:
+- Add dashboard example
 - Clean up odds and ends
 
 ## References:
